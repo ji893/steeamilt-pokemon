@@ -67,31 +67,34 @@ initial_pokemons = [
 if "pokemons" not in st.session_state:
     st.session_state.pokemons = initial_pokemons.copy()
 
-# ✅ 예시 데이터 추가 버튼
-example = {
+# 예시 데이터 정의
+example_pokemon = {
     "name": "알로라 디그다",
     "types": ["땅", "강철"],
     "image_url": "https://storage.googleapis.com/firstpenguine-coding-school/pokemons/alora_digda.webp"
 }
-if st.toggle("예시 포켓몬 추가 (알로라 디그다)"):
-    if all(p["name"] != example["name"] for p in st.session_state.pokemons):
-        st.session_state.pokemons.append(example)
-        st.success("알로라 디그다가 추가되었습니다!")
-        st.rerun()
-    else:
-        st.info("알로라 디그다는 이미 추가되어 있습니다.")
 
-# 🔽 포켓몬 추가 폼
-with st.form(key="form"):
+# 예시 데이터로 채우기 토글
+auto_complete = st.toggle("예시 데이터로 채우기")
+
+# 포켓몬 추가 폼
+with st.form("form"):
     col1, col2 = st.columns(2)
     with col1:
-        name = st.text_input(label="포켓몬 이름")
+        name = st.text_input(
+            label="포켓몬 이름",
+            value=example_pokemon["name"] if auto_complete else ""
+        )
     with col2:
         types = st.multiselect(
             label="포켓몬 속성",
-            options=type_emoji_dict.keys(),
+            options=list(type_emoji_dict.keys()),
+            default=example_pokemon["types"] if auto_complete else []
         )
-    image_url = st.text_input(label="포켓몬 이미지 URL")
+    image_url = st.text_input(
+        label="포켓몬 이미지 URL",
+        value=example_pokemon["image_url"] if auto_complete else ""
+    )
     submit = st.form_submit_button(label="등록")
 
     if submit:
@@ -108,7 +111,7 @@ with st.form(key="form"):
             st.success(f"{name} 이(가) 추가되었습니다!")
             st.rerun()
 
-# 📋 포켓몬 목록 출력
+# 포켓몬 목록 출력
 st.subheader("등록된 포켓몬 목록")
 for i in range(0, len(st.session_state.pokemons), 3):
     row_pokemons = st.session_state.pokemons[i:i+3]
