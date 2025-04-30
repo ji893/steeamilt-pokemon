@@ -27,28 +27,6 @@ type_emoji_dict = {
     "페어리": "🧚"
 }
 
-
-
-example_pokemon = {
-    "name": "알로라 디그다",
-    "types": ["땅", "강철"],
-    "image_url": "https://storage.googleapis.com/firstpenguine-coding-school/pokemons/alora_digda.webp"
-}
-auto_complete = st.toggle("예시 데이터로 채우기")
-
-pokemon = {
-    "name": "누오",
-    "types": ["물", "땅"],
-    "image_url": "https://i.namu.wiki/i/0KC24R7hvHoRQFaki5E9aJJc4h4NGh0szPAL9G7XDNPc6RiIdf7qCGfJkjrv3usF-ci2LLqQgxiFr1n7WTcbfYFKpWDnSyeVI8uUDBWwZ7-0V8hkd0VTPcms-NKxQXR3FEjJfQD8aJ40UW48XI8Qig.webp"
-}
-
-with st.expander(label=pokemon["name"], expanded=True):
-    st.image(pokemon["image_url"])
-    emoji_types = [f"{type_emoji_dict[x]} {x}" for x in pokemon["types"]]
-    st.subheader(f" / ".join(emoji_types))
-
-
-
 pokemons = [
     {
         "name": "피카츄",
@@ -81,6 +59,24 @@ pokemons = [
         "image_url": "https://storage.googleapis.com/firstpenguine-coding-school/pokemons/acebun.webp"
     },
 ]
+
+
+example_pokemon = {
+    "name": "알로라 디그다",
+    "types": ["땅", "강철"],
+    "image_url": "https://storage.googleapis.com/firstpenguine-coding-school/pokemons/alora_digda.webp"
+}
+auto_complete = st.toggle("예시 데이터로 채우기")
+with st.form(key="form"):
+	...
+
+pokemon = {
+    "name": "누오",
+    "types": ["물", "땅"],
+    "image_url": "https://static.wikia.nocookie.net/pokemon/images/4/48/%EB%88%84%EC%98%A4_%EA%B3%B5%EC%8B%9D_%EC%9D%BC%EB%9F%AC%EC%8A%A4%ED%8A%B8.png/revision/latest?cb=20170406075557&path-prefix=ko"
+}
+
+
 
 for i in range(0, len(pokemons), 3):
     row_pokemons = pokemons[i:i+3]
@@ -155,4 +151,6 @@ for i in range(0, len(st.session_state.pokemons), 3):
                         # print("삭제 버튼 누르셨네요.")
                         del st.session_state.pokemons[i+j]
                         st.rerun()
+
+
 
