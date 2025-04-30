@@ -33,7 +33,35 @@ pokemon = {
     "image_url": "https://i.namu.wiki/i/0KC24R7hvHoRQFaki5E9aJJc4h4NGh0szPAL9G7XDNPc6RiIdf7qCGfJkjrv3usF-ci2LLqQgxiFr1n7WTcbfYFKpWDnSyeVI8uUDBWwZ7-0V8hkd0VTPcms-NKxQXR3FEjJfQD8aJ40UW48XI8Qig.webp"
 }
 
+example_pokemon = {
+    "name": "알로라 디그다",
+    "types": ["땅", "강철"],
+    "image_url": "https://storage.googleapis.com/firstpenguine-coding-school/pokemons/alora_digda.webp"
+}
+auto_complete = st.toggle("예시 데이터로 채우기")
 
+# 폼에 고유한 key 값을 부여하기 위해 key 값을 동적으로 변경합니다.
+with st.form(key="form1"):  # 고유한 key 사용
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        name = st.text_input(
+            label="포켓몬 이름",
+            value=example_pokemon["name"] if auto_complete else ""
+        )
+    
+    with col2:
+        types = st.multiselect(
+            label="포켓몬 속성",
+            options=list(type_emoji_dict.keys()),
+            max_selections=2,
+            default=example_pokemon["types"] if auto_complete else []
+        )
+    
+    image_url = st.text_input(
+        label="포켓몬 이미지 URL",
+        value=example_pokemon["image_url"] if auto_complete else ""
+    )
 
 with st.expander(label=pokemon["name"], expanded=True):
     st.image(pokemon["image_url"])
@@ -118,35 +146,7 @@ if "pokemons" not in st.session_state:
     st.session_state.pokemons = initial_pokemons
 
 
-example_pokemon = {
-    "name": "알로라 디그다",
-    "types": ["땅", "강철"],
-    "image_url": "https://storage.googleapis.com/firstpenguine-coding-school/pokemons/alora_digda.webp"
-}
-auto_complete = st.toggle("예시 데이터로 채우기")
 
-# 폼에 고유한 key 값을 부여하기 위해 key 값을 동적으로 변경합니다.
-with st.form(key="form1"):  # 고유한 key 사용
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        name = st.text_input(
-            label="포켓몬 이름",
-            value=example_pokemon["name"] if auto_complete else ""
-        )
-    
-    with col2:
-        types = st.multiselect(
-            label="포켓몬 속성",
-            options=list(type_emoji_dict.keys()),
-            max_selections=2,
-            default=example_pokemon["types"] if auto_complete else []
-        )
-    
-    image_url = st.text_input(
-        label="포켓몬 이미지 URL",
-        value=example_pokemon["image_url"] if auto_complete else ""
-    )
     
     submit_button = st.form_submit_button(label="제출")
 
@@ -173,7 +173,4 @@ for i in range(0, len(st.session_state.pokemons), 3):
                         # print("삭제 버튼 누르셨네요.")
                         del st.session_state.pokemons[i+j]
                         st.rerun()
-            else:
-                # pokemon이 제대로 정의되지 않은 경우 처리
-                st.error("포켓몬 데이터가 올바르게 로드되지 않았습니다.")
 
