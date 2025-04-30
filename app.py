@@ -29,7 +29,7 @@ type_emoji_dict = {
     "페어리": "🧚"
 }
 
-# 초기 포켓몬 데이터
+# 초기 포켓몬 리스트
 initial_pokemons = [
     {
         "name": "피카츄",
@@ -65,20 +65,23 @@ initial_pokemons = [
 
 # session_state에 pokemons 없으면 초기화
 if "pokemons" not in st.session_state:
-    st.session_state.pokemons = initial_pokemons
+    st.session_state.pokemons = initial_pokemons.copy()
 
-# 예시 데이터 토글 (사용자는 이걸로 미리 채울 수 있음)
-auto_complete = st.toggle("예시 데이터로 채우기")
-if auto_complete:
-    example = {
-        "name": "알로라 디그다",
-        "types": ["땅", "강철"],
-        "image_url": "https://storage.googleapis.com/firstpenguine-coding-school/pokemons/alora_digda.webp"
-    }
-    st.session_state.pokemons.append(example)
-    st.rerun()
+# ✅ 예시 데이터 추가 버튼
+example = {
+    "name": "알로라 디그다",
+    "types": ["땅", "강철"],
+    "image_url": "https://storage.googleapis.com/firstpenguine-coding-school/pokemons/alora_digda.webp"
+}
+if st.toggle("예시 포켓몬 추가 (알로라 디그다)"):
+    if all(p["name"] != example["name"] for p in st.session_state.pokemons):
+        st.session_state.pokemons.append(example)
+        st.success("알로라 디그다가 추가되었습니다!")
+        st.rerun()
+    else:
+        st.info("알로라 디그다는 이미 추가되어 있습니다.")
 
-# 새 포켓몬 추가 폼
+# 🔽 포켓몬 추가 폼
 with st.form(key="form"):
     col1, col2 = st.columns(2)
     with col1:
@@ -87,36 +90,37 @@ with st.form(key="form"):
         types = st.multiselect(
             label="포켓몬 속성",
             options=type_emoji_dict.keys(),
-            max_selections=2
         )
     image_url = st.text_input(label="포켓몬 이미지 URL")
     submit = st.form_submit_button(label="등록")
 
     if submit:
-        st.session_state.pokemons.append(
-            {
-                "name": name,
-                "types": types,
-                "image_url": image_url if image_url else "./images/default.png"
-            }
-        )
-        st.success(f"{name} 이(가) 추가되었습니다!")
-        st.rerun()
+        if not name or not types:
+            st.warning("이름과 속성은 필수 항목입니다.")
+        else:
+            st.session_state.pokemons.append(
+                {
+                    "name": name,
+                    "types": types,
+                    "image_url": image_url if image_url else "./images/default.png"
+                }
+            )
+            st.success(f"{name} 이(가) 추가되었습니다!")
+            st.rerun()
 
-# 포켓몬 목록 출력
-st.subheader("📋 등록된 포켓몬 목록")
+# 📋 포켓몬 목록 출력
+st.subheader("등록된 포켓몬 목록")
 for i in range(0, len(st.session_state.pokemons), 3):
     row_pokemons = st.session_state.pokemons[i:i+3]
     cols = st.columns(3)
     for j in range(len(row_pokemons)):
         with cols[j]:
             pokemon = row_pokemons[j]
-            if isinstance(pokemon, dict) and 'name' in pokemon:
-                with st.expander(label=f"**{i+j+1}. {pokemon['name']}**", expanded=True):
-                    st.image(pokemon["image_url"])
-                    emoji_types = [f"{type_emoji_dict[t]} {t}" for t in pokemon["types"]]
-                    st.subheader(" / ".join(emoji_types))
+            with st.expander(label=f"**{i+j+1}. {pokemon['name']}**", expanded=True):
+                st.image(pokemon["image_url"])
+                emoji_types = [f"{type_emoji_dict[t]} {t}" for t in pokemon["types"]]
+                st.subheader(" / ".join(emoji_types))
 
-                    if st.button(label="❌ 삭제", key=f"delete_{i+j}", use_container_width=True):
-                        del st.session_state.pokemons[i + j]
-                        st.rerun()
+                if st.button("❌ 삭제", key=f"delete_{i+j}", use_container_width=True):
+                    del st.session_state.pokemons[i + j]
+                    st.rerun()
