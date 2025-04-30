@@ -1,11 +1,13 @@
 import streamlit as st
 
+# 페이지 설정
 st.set_page_config(
-page_title="안정호 포켓몬 도감",
-page_icon="./images/monsterball.png"
+    page_title="안정호 포켓몬 도감",
+    page_icon="./images/monsterball.png"
 )
-st.title("streamlit 포켓몬 도감")
+st.title("🐾 Streamlit 포켓몬 도감")
 
+# 타입 이모지 매핑
 type_emoji_dict = {
     "노말": "⚪",
     "격투": "✊",
@@ -27,7 +29,8 @@ type_emoji_dict = {
     "페어리": "🧚"
 }
 
-pokemons = [
+# 초기 포켓몬 데이터
+initial_pokemons = [
     {
         "name": "피카츄",
         "types": ["전기"],
@@ -60,97 +63,60 @@ pokemons = [
     },
 ]
 
-
-example_pokemon = {
-    "name": "알로라 디그다",
-    "types": ["땅", "강철"],
-    "image_url": "https://storage.googleapis.com/firstpenguine-coding-school/pokemons/alora_digda.webp"
-}
-auto_complete = st.toggle("예시 데이터로 채우기")
-with st.form(key="form"):
-	...
-
-pokemon = {
-    "name": "누오",
-    "types": ["물", "땅"],
-    "image_url": "https://static.wikia.nocookie.net/pokemon/images/4/48/%EB%88%84%EC%98%A4_%EA%B3%B5%EC%8B%9D_%EC%9D%BC%EB%9F%AC%EC%8A%A4%ED%8A%B8.png/revision/latest?cb=20170406075557&path-prefix=ko"
-}
-
-
-
-for i in range(0, len(pokemons), 3):
-    row_pokemons = pokemons[i:i+3]
-    cols = st.columns(3)
-    for j in range(len(row_pokemons)):
-        with cols[j]:
-            pokemon = row_pokemons[j]
-            with st.expander(label=f"**{i+j+1}. {pokemon['name']}**", expanded=True):
-                st.image(pokemon["image_url"])
-                emoji_types = [f"{type_emoji_dict[x]} {x}" for x in pokemon["types"]]
-                st.text(" / ".join(emoji_types))
-
-with st.form(key="form"):
-    col1, col2 = st.columns(2)
-    with col1 :
-        name = st.text_input(label="포켓몬 이름")
-    with col2:
-        types = st.multiselect(
-        label="포켓몬 속성",
-        options=type_emoji_dict.keys(),
-        max_selections=2
-    )
-    image_url = st.text_input(label="포켓몬 이미지 URL")
-    submit = st.form_submit_button(label="Submit")
-    if submit:
-        pokemons.append(
-            {
-            "name": name,
-            "types": types,
-            "image_url": image_url if image_url else "./images/default.png"
-            }
-    )
-        
-initial_pokemons = [
-    {
-        "name": "피카츄",
-        "types": ["전기"],
-        "image_url": "https://i.namu.wiki/i/R9GjiUEKY9snXwP9mqXDRsHkZ0yK5GVoJtFHEMCamYe5jd4FeIrcMMU6ZRuMnJ0Pckci7qhOhWhXLqqoRNfovfVysbJVtiO1J2aiwwlf6Xi-_KHpXCnkchch9GxvW5zVKf_5PeTtSQD5xm6yLrdMdw.webp",
-    },
-    ...
-]
-
-# session_state에 키 값 체크, 없으면 초기값 할당
+# session_state에 pokemons 없으면 초기화
 if "pokemons" not in st.session_state:
     st.session_state.pokemons = initial_pokemons
 
+# 예시 데이터 토글 (사용자는 이걸로 미리 채울 수 있음)
+auto_complete = st.toggle("예시 데이터로 채우기")
+if auto_complete:
+    example = {
+        "name": "알로라 디그다",
+        "types": ["땅", "강철"],
+        "image_url": "https://storage.googleapis.com/firstpenguine-coding-school/pokemons/alora_digda.webp"
+    }
+    st.session_state.pokemons.append(example)
+    st.rerun()
 
+# 새 포켓몬 추가 폼
+with st.form(key="form"):
+    col1, col2 = st.columns(2)
+    with col1:
+        name = st.text_input(label="포켓몬 이름")
+    with col2:
+        types = st.multiselect(
+            label="포켓몬 속성",
+            options=type_emoji_dict.keys(),
+            max_selections=2
+        )
+    image_url = st.text_input(label="포켓몬 이미지 URL")
+    submit = st.form_submit_button(label="등록")
 
-    
-    submit_button = st.form_submit_button(label="제출")
+    if submit:
+        st.session_state.pokemons.append(
+            {
+                "name": name,
+                "types": types,
+                "image_url": image_url if image_url else "./images/default.png"
+            }
+        )
+        st.success(f"{name} 이(가) 추가되었습니다!")
+        st.rerun()
 
-# 포켓몬 목록을 출력하는 코드
-# for loop에서 pokemon 객체를 확인해봅니다
+# 포켓몬 목록 출력
+st.subheader("📋 등록된 포켓몬 목록")
 for i in range(0, len(st.session_state.pokemons), 3):
     row_pokemons = st.session_state.pokemons[i:i+3]
     cols = st.columns(3)
-    
     for j in range(len(row_pokemons)):
         with cols[j]:
             pokemon = row_pokemons[j]
-            
-            # pokemon이 제대로 정의되었는지 확인
             if isinstance(pokemon, dict) and 'name' in pokemon:
-                # f-string 안에서 pokemon의 'name'을 사용
                 with st.expander(label=f"**{i+j+1}. {pokemon['name']}**", expanded=True):
                     st.image(pokemon["image_url"])
-                    emoji_types = [f"{type_emoji_dict[x]} {x}" for x in pokemon["types"]]
-                    st.subheader(f"/".join(emoji_types))
-                    
-                    delete_button = st.button(label="삭제", key=f"delete_{i+j}", use_container_width=True)
-                    if delete_button:
-                        # print("삭제 버튼 누르셨네요.")
-                        del st.session_state.pokemons[i+j]
+                    emoji_types = [f"{type_emoji_dict[t]} {t}" for t in pokemon["types"]]
+                    st.subheader(" / ".join(emoji_types))
+
+                    if st.button(label="❌ 삭제", key=f"delete_{i+j}", use_container_width=True):
+                        del st.session_state.pokemons[i + j]
                         st.rerun()
-
-
-
